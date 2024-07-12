@@ -40,8 +40,9 @@ document.querySelectorAll("button").forEach((element) => {
 let reg_op = /[\(\)\-\+\/\^\*]/;
 function compute() {
   let input = inputField.value;
-  let reg = /[\/\w\-\+\(\)\^\*\.]/g;
+  let reg = /[\/0-9\-\+\(\)\^\*\.]/g;
   let inputArray = input.match(reg);
+  if (checkValidity(inputArray)) {
   inputArray = getNumber(inputArray);
   let result = 0;
   inputArray = getpostfix(inputArray);
@@ -78,6 +79,7 @@ function compute() {
     i++;
   }
   inputField.value = inputArray[0];
+  }
 }
 
 function getNumber(inputArray) {
@@ -158,4 +160,34 @@ function removeElementIndex(array, [...index]) {
     }
   }
   return tempArray;
+}
+let reg_number = /[0-9]/;
+document.querySelector("body").addEventListener("keypress", (e) => {
+  if (e.key.match(reg_number) || e.key.match(reg_op)) {
+    e.preventDefault();
+    inputField.value += e.key;
+    inputField.scrollLeft = inputField.scrollWidth;
+  } else if (e.key == "Backspace") {
+    e.preventDefault();
+    inputField.value = inputField.value.slice(0, inputField.value.length - 1);
+  }
+})
+
+function checkValidity(input) {
+  let stack = new Array();
+  for (let i = 0; i < input.length; i++) {
+    if (input[i] == '(') {
+      stack.push(1);
+    } else if (input[i] == ')') {
+      stack.pop();
+    }
+  }
+  if (stack.length) {
+    let text = inputField.value;
+    inputField.value = "INVALID INPUT";
+    const holdmsg = setTimeout(() => {
+      inputField.value = text;
+    }, 1000);
+    return 0;
+  } else return 1;
 }
